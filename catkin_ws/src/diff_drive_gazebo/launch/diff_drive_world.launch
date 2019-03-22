@@ -1,6 +1,14 @@
 <launch>	  
-	<include file="$(find gazebo_ros)/launch/empty_world.launch">	    
-		<arg name="world_name" value="$(find diff_drive_gazebo)/worlds/diff_drive.world"/>	    
-		<arg name="gui" value="true"/>	  
-	</include>	
+<include file="$(find gazebo_ros)/launch/empty_world.launch">	    
+	<arg name="world_name" value="$(find diff_drive_gazebo)/worlds/diff_drive.world"/>	    
+	<arg name="gui" value="true"/>	  
+</include>	
+
+<!-- urdf xml robot description loaded on the Parameter Server, converting the xacro into a proper urdf file-->
+<param name="robot_description" command="$(find xacro)/xacro.py '$(find diff_drive_description)/urdf/diff_drive.xacro'" />
+
+<!-- push robot_description to factory and spawn robot in gazebo -->
+<node name="diff_drive_spawn" pkg="gazebo_ros" type="spawn_model" output="screen"
+ args="-urdf -param robot_description -model diff_drive" />
+
 </launch>
