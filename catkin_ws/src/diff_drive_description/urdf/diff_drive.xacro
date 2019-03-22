@@ -16,19 +16,23 @@
 
 <xacro:property name="wheelWidth" value="0.05"/>
 <xacro:property name="wheelRadius" value="0.1"/>
-<xacro:property name="wheelPos" value="0.2"/>
+<xacro:property name="wheelPos" value="${wheelRadius}"/>
 <xacro:property name="wheelMass" value="5"/>
 
 <xacro:property name="cameraSize" value="0.05"/>
 <xacro:property name="cameraMass" value="0.1"/>
 
+
+<!-- base joint -->
 <link name="footprint"/>
 
 <joint name="base_joint" type="fixed">
 	<parent link="footprint"/>
 	<child link="chassis"/>
 </joint>
- 	
+
+
+<!-- chassis -->
 <link name="chassis">
 <collision> 
 	<origin xyz="0 0 ${wheelRadius}" rpy="0 0 0"/> 
@@ -49,5 +53,40 @@
 	<box_inertia m="${chassisMass}" x="${chassisLength}" y="${chassisWidth}" z="${chassisHeight}"/>
 </inertial>
 </link>
+
+
+<!-- caster wheel -->
+<joint name="fixed" type="fixed">
+  <parent link="chassis"/>
+  <child link="caster_wheel"/>
+</joint>
+
+<link name="caster_wheel">
+  <collision>
+    <origin xyz="${casterRadius-chassisLength/2} 0 ${casterRadius-chassisHeight+wheelRadius}" rpy="0 0 0"/>
+    <geometry>
+      <sphere radius="${casterRadius}"/>
+    </geometry>
+  </collision>
+  
+  <visual>
+    <origin xyz="${casterRadius-chassisLength/2} 0 ${casterRadius-chassisHeight+wheelRadius}" rpy="0 0 0"/>
+    <geometry>
+      <sphere radius="${casterRadius}"/>
+    </geometry>
+    <material name="red"/>
+  </visual>
+
+  <inertial>
+    <origin xyz="${casterRadius-chassisLength/2} 0 ${casterRadius-chassisHeight+wheelRadius}" rpy="0 0 0"/>
+    <mass value="${casterMass}"/>
+    <sphere_inertia m="${casterMass}" r="${casterRadius}"/>
+  </inertial>
+</link>
+
+
+<!-- main wheels -->
+<wheel lr="left" tY="1"/>
+<wheel lr="right" tY="-1"/> 	
 
 </robot>
