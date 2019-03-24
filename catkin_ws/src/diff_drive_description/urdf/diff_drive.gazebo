@@ -11,4 +11,17 @@
   <material>Gazebo/Red</material>
 </gazebo>
 
+<!-- differential drive plugin -->
+<gazebo>
+	<plugin name="differential_drive_controller"
+			filename="libgazebo_ros_diff_drive.so">
+		<leftJoint>left_wheel_hinge</leftJoint>
+		<rightJoint>right_wheel_hinge</rightJoint>
+		<robotBaseFrame>base_link</robotBaseFrame>
+		<wheelSeparation>${chassisWidth}</wheelSeparation>
+		<wheelDiameter>${2*wheelRadius}</wheelDiameter>
+		<publishWheelJointState>true</publishWheelJointState>
+	</plugin>
+</gazebo>
+
 </robot>
