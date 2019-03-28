@@ -1,6 +1,9 @@
-<launch>	  
+<launch>
+<!-- call from command line with world:=bot_test_world -->	
+<arg name="world" default="rect_room"/>
+ 	  
 <include file="$(find gazebo_ros)/launch/empty_world.launch">	    
-	<arg name="world_name" value="$(find diff_drive_gazebo)/worlds/diff_drive.world"/>	    
+	<arg name="world_name" value="$(find diff_drive_gazebo)/worlds/$(arg world).world"/>	    
 	<arg name="gui" value="true"/>	  
 </include>	
 
