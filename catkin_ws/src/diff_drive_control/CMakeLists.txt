@@ -10,6 +10,8 @@ project(diff_drive_control)
 find_package(catkin REQUIRED COMPONENTS
 	roscpp
 	geometry_msgs
+	nav_msgs
+	tf
 )
 
 ## System dependencies are found with CMake's conventions
