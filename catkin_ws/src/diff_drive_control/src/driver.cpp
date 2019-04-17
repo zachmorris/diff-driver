@@ -22,6 +22,8 @@ const int g_desired_position_y = 7;
 const double g_yaw_precision = 3.14159/90;
 const double g_dist_precision = 0.3;
 
+// PID variables
+const double g_kp = 0.1;
 
 ros::Publisher direction_pub;
 
@@ -45,7 +47,7 @@ void odom_callback(const nav_msgs::Odometry::ConstPtr &msg){
 	m.getRPY(roll, pitch, g_yaw);
 	
 	// do something with yaw
-	ROS_INFO("Current yaw: [%f]", g_yaw);
+	//ROS_INFO("Current yaw: [%f]", g_yaw);
 	
 }
 
@@ -56,13 +58,22 @@ void go_to_goal(){
 	
 	err_yaw = desired_yaw - g_yaw;
 	
+	// velocity message to publish
+	geometry_msgs::Twist vel;		
+	
 	if (fabs(err_yaw) > g_yaw_precision){
 		ROS_INFO("Correcting yaw.");
-		// TODO add twist message, fill with delicious yaw and publish
+		vel.angular.z = -g_kp * err_yaw;
+		ROS_INFO("Current yaw: [%f]", g_yaw);
+		ROS_INFO("Desired yaw: [%f]", desired_yaw);		
+		ROS_INFO("Current error: [%f]", err_yaw);				
+		
 	} else {
-		ROS_INFO("Yaw good homes.");
+		ROS_INFO("Yaw good homes.");	
+		vel.angular.z = 0;		
 	}
 		
+	direction_pub.publish(vel);
 }
 
 
