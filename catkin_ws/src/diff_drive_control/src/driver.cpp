@@ -15,15 +15,28 @@
 double g_x, g_y, g_yaw;
 
 // goal
-const int g_desired_position_x = -3;
-const int g_desired_position_y = 7;
+const int g_x_goal = -2;
+const int g_y_goal = 3;
 
 // precision
 const double g_yaw_precision = 3.14159/90;
-const double g_dist_precision = 0.3;
+const double g_dist_precision = 0.2;
 
 // PID variables
-const double g_kp = 0.1;
+const double g_kp = 0.5;
+
+namespace Robot_States
+{
+  enum Robot_State
+  {
+     GO_TO_GOAL,
+     STOP
+  };
+}
+typedef Robot_States::Robot_State Robot_State;
+
+
+Robot_State diff_drive_state = Robot_States::GO_TO_GOAL;
 
 ros::Publisher direction_pub;
 
@@ -34,6 +47,7 @@ void odom_callback(const nav_msgs::Odometry::ConstPtr &msg){
 	// get position
 	g_x = msg->pose.pose.position.x;
 	g_y = msg->pose.pose.position.y;
+	ROS_INFO("Current position: [%f, %f]", g_x, g_y);	
 	
 	
 	// convert quaternion to Euler angles, get yaw	
@@ -54,11 +68,10 @@ void odom_callback(const nav_msgs::Odometry::ConstPtr &msg){
 
 void go_to_goal(){
 	double desired_yaw, err_yaw;
-	desired_yaw = atan2(g_desired_position_y - g_y, g_desired_position_x - g_x);
+	desired_yaw = atan2(g_y_goal - g_y, g_x_goal - g_x);
 	
 	err_yaw = desired_yaw - g_yaw;
 	
-	// velocity message to publish
 	geometry_msgs::Twist vel;		
 	
 	if (fabs(err_yaw) > g_yaw_precision){
@@ -72,8 +85,32 @@ void go_to_goal(){
 		ROS_INFO("Yaw good homes.");	
 		vel.angular.z = 0;		
 	}
+	
+	//TODO fix this position thing
+	double dist_to_goal = sqrt(pow(g_y_goal - g_y, 2.0) + pow(g_x_goal - g_x, 2.0));
+	
+	ROS_INFO("Distance to goal: [%f]", dist_to_goal);
+	
+	if (fabs(dist_to_goal) > g_dist_precision){
+		ROS_INFO("Driving forward.");
+		vel.linear.x = 0.1;				
+		
+	} else {
+		ROS_INFO("Position good homes.");			
+		diff_drive_state = Robot_State::STOP;
+	}
 		
 	direction_pub.publish(vel);
+}
+
+
+void stop(){
+	geometry_msgs::Twist vel;
+	
+	vel.linear.x = 0;
+	vel.angular.z = 0;
+	
+	direction_pub.publish(vel);	
 }
 
 
@@ -97,7 +134,19 @@ int main(int argc, char **argv)
   
   while (ros::ok()){
   	
-  	go_to_goal();
+  	switch (diff_drive_state){
+  		case Robot_States::GO_TO_GOAL:
+	  		ROS_INFO("Go to goal!");
+  			go_to_goal();
+  			break;
+  		case Robot_States::STOP:
+  			ROS_INFO("Stop!");
+  			stop();
+  			break;
+  		default:
+  			ROS_INFO("Unknown state!");
+  			break;
+  	}
   	
 		ros::spinOnce();
 		rate.sleep();
