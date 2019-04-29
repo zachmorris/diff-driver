@@ -172,8 +172,8 @@ ${catkin_INCLUDE_DIRS}
 #   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 # )
 
-## Mark cpp header files for installation
-# install(DIRECTORY include/${PROJECT_NAME}/
+# Mark cpp header files for installation
+#install(DIRECTORY include/${PROJECT_NAME}/
 #   DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
 #   FILES_MATCHING PATTERN "*.h"
 #   PATTERN ".svn" EXCLUDE
@@ -199,6 +199,6 @@ ${catkin_INCLUDE_DIRS}
 ## Add folders to be run by python nosetests
 # catkin_add_nosetests(test)
 
-add_executable(driver src/driver.cpp)
+add_executable(driver src/driver.cpp src/go_to_goal.cpp src/stop.cpp)
 target_link_libraries(driver ${catkin_LIBRARIES})
 add_dependencies(driver diff_drive_control_generate_messages_cpp)
