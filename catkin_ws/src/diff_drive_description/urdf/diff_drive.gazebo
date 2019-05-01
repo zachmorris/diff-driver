@@ -11,6 +11,9 @@
   <material>Gazebo/Red</material>
 </gazebo>
 
+<!-- laser sensor -->
+
+
 <!-- differential drive plugin -->
 <gazebo>
 	<plugin name="differential_drive_controller"

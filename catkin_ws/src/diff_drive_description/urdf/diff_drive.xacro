@@ -19,8 +19,9 @@
 <xacro:property name="wheelPos" value="${wheelRadius}"/>
 <xacro:property name="wheelMass" value="5"/>
 
-<xacro:property name="cameraSize" value="0.05"/>
-<xacro:property name="cameraMass" value="0.1"/>
+<xacro:property name="laserHeight" value="0.1"/>
+<xacro:property name="laserRadius" value="0.05"/>
+<xacro:property name="laserMass" value="0.1"/>
 
 
 <!-- base joint -->
@@ -88,5 +89,34 @@
 <!-- main wheels -->
 <wheel lr="left" tY="1"/>
 <wheel lr="right" tY="-1"/> 	
+
+<!-- laser sensor -->
+<link name="hokuyo_link">
+	<collision>
+		<origin xyz="0 0 0" rpy="0 0 0"/>
+		<geometry>
+			<cylinder radius="${laserRadius}" length="${laserHeight}"/>
+		</geometry>
+	</collision>
+	<visual>
+		<origin xyz="0 0 0" rpy="0 0 0"/>
+		<geometry>
+			<cylinder radius="${laserRadius}" length="${laserHeight}"/>
+		</geometry>
+		<material name="white"/>
+	</visual>
+	<inertial> 
+		<origin xyz="0 0 0" rpy="0 0 0"/> 
+		<mass value="${laserMass}"/> 
+		<cylinder_inertia m="${laserMass}" r="${laserRadius}" h="${laserHeight}"/>
+	</inertial>
+</link>
+
+<joint name="hokuyo_joint" type="fixed">
+	<axis xyz="0 1 0"/>
+	<origin xyz="${casterRadius-chassisLength/2} 0 ${chassisHeight+wheelRadius}" rpy="0 0 0"/> 
+	<parent link="base_link"/>
+	<child link="hokuyo_link"/>
+</joint>
 
 </robot>
