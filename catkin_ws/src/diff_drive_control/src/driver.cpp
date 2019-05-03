@@ -1,5 +1,6 @@
 // user includes
 #include "driver.h"
+#include "avoid_obstacles.h"
 #include "go_to_goal.h"
 #include "stop.h"
 
@@ -47,6 +48,9 @@ int main(int argc, char **argv)
 	
 	// subscribe to odom with buffer size one to reduce delayed commands
 	ros::Subscriber odom_sub = node.subscribe("odom", 1, odom_callback);
+	
+	// subscribe to scan with buffer size one to reduce delayed commands
+	ros::Subscriber laser_sub = node.subscribe("scan", 1, laser_callback);
 	
 	// publish a message on cmd_vel with buffer size one
 	ros::Publisher direction_pub;

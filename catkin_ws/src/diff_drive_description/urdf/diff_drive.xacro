@@ -114,7 +114,7 @@
 
 <joint name="hokuyo_joint" type="fixed">
 	<axis xyz="0 1 0"/>
-	<origin xyz="${casterRadius-chassisLength/2} 0 ${chassisHeight+wheelRadius}" rpy="0 0 0"/> 
+	<origin xyz="${casterRadius-chassisLength/2} 0 ${chassisHeight+wheelRadius}" rpy="0 0 ${PI}"/> 
 	<parent link="base_link"/>
 	<child link="hokuyo_link"/>
 </joint>
