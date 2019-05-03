@@ -25,16 +25,16 @@
 
 
 <!-- base joint -->
-<link name="base_link"/>
+<!--<link name="base_link"/>
 
 <joint name="base_joint" type="fixed">
 	<parent link="base_link"/>
 	<child link="chassis"/>
-</joint>
+</joint>-->
 
 
 <!-- chassis -->
-<link name="chassis">
+<link name="base_link">
 <collision> 
 	<origin xyz="0 0 ${wheelRadius}" rpy="0 0 0"/> 
 	<geometry> 
@@ -57,21 +57,23 @@
 
 
 <!-- caster wheel -->
-<joint name="fixed" type="fixed">
-  <parent link="chassis"/>
-  <child link="caster_wheel"/>
+<joint name="front_caster_joint" type="continuous">
+	<axis xyz="0 0 1"/>
+	<origin xyz="${casterRadius-chassisLength/2} 0 ${casterRadius-chassisHeight+wheelRadius}" rpy="0 0 0"/> 
+  <parent link="base_link"/>
+  <child link="front_caster"/>
 </joint>
 
-<link name="caster_wheel">
+<link name="front_caster">
   <collision>
-    <origin xyz="${casterRadius-chassisLength/2} 0 ${casterRadius-chassisHeight+wheelRadius}" rpy="0 0 0"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
     <geometry>
       <sphere radius="${casterRadius}"/>
     </geometry>
   </collision>
   
   <visual>
-    <origin xyz="${casterRadius-chassisLength/2} 0 ${casterRadius-chassisHeight+wheelRadius}" rpy="0 0 0"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
     <geometry>
       <sphere radius="${casterRadius}"/>
     </geometry>
@@ -79,7 +81,7 @@
   </visual>
 
   <inertial>
-    <origin xyz="${casterRadius-chassisLength/2} 0 ${casterRadius-chassisHeight+wheelRadius}" rpy="0 0 0"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
     <mass value="${casterMass}"/>
     <sphere_inertia m="${casterMass}" r="${casterRadius}"/>
   </inertial>
