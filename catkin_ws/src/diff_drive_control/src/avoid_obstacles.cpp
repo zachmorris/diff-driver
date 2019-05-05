@@ -5,9 +5,19 @@
 
 // callback function for subscriber
 void laser_callback(const sensor_msgs::LaserScan::ConstPtr &scan){
-	// min_element returns pointer to the min element
-	// dereference the pointer to get the min value
-	float i1 = *std::min_element(std::begin(scan->ranges), std::end(scan->ranges)); 
-  
-  ROS_INFO("Closest element on right: [%f]", i1);			
+	
+	std::array<float, 5> regions { 
+		*std::min_element((scan->ranges).begin()      , (scan->ranges).begin() + 143),
+		*std::min_element((scan->ranges).begin() + 144, (scan->ranges).begin() + 287),
+		*std::min_element((scan->ranges).begin() + 288, (scan->ranges).begin() + 431),
+		*std::min_element((scan->ranges).begin() + 432, (scan->ranges).begin() + 575),
+		*std::min_element((scan->ranges).begin() + 576, (scan->ranges).begin() + 719)
+	};
+
+  for(auto &element : regions){
+  	if(std::isinf(element))
+  		element = 10;
+  	
+    ROS_INFO("Closest element on right: [%f]", element);			
+  }
 }
