@@ -4,6 +4,7 @@ namespace Robot_States
   enum Robot_State
   {
      GO_TO_GOAL,
+     AVOID_OBSTACLE,
      STOP
   };
 }

@@ -7,6 +7,8 @@
 // ros includes
 #include "ros/ros.h"
 #include "nav_msgs/Odometry.h"
+#include "sensor_msgs/LaserScan.h"
+
 #include "tf/tf.h"
 
 
@@ -16,8 +18,9 @@ Robot_Pose Robot_Goal = {0, -1.0, 0};
 // diff_driver pose
 Robot_Pose Current_Pose;
 
+const double g_goal_dist = 0.2;
 
-// callback function for subscriber
+
 void odom_callback(const nav_msgs::Odometry::ConstPtr &msg){
 	// get position
 	Current_Pose.x = msg->pose.pose.position.x;
@@ -67,8 +70,18 @@ int main(int argc, char **argv)
   	
   	switch (diff_drive_state){
   		case Robot_States::GO_TO_GOAL:
-	  		ROS_INFO("Go to goal!");
-  			diff_drive_state = go_to_goal(direction_pub, Robot_Goal, Current_Pose);
+	  		if(dist_to_goal(Robot_Goal, Current_Pose) < g_goal_dist){
+	  			diff_drive_state = Robot_States::STOP;
+	  		}
+	  		//else if (dist_to_obst < min_safe_dist){
+	  		//	diff_drive_state = Robot_States::AVOID_OBSTACLE;
+	  		//}
+	  		else {
+	  			ROS_INFO("Go to goal!");
+  				go_to_goal(direction_pub, Robot_Goal, Current_Pose);
+	  		}  		
+	  		break;
+  		case Robot_States::AVOID_OBSTACLE:
   			break;
   		case Robot_States::STOP:
   			ROS_INFO("Stop!");
