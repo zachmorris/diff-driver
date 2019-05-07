@@ -13,7 +13,6 @@
 
 // precision
 const double g_yaw_precision 	= 3.14159/90;
-const double g_min_safe_distance = 0.5;
 
 // PID variables
 const double g_kp 	= 0.5;
@@ -47,21 +46,27 @@ double min_obstacle_distance(){
 	return min_dist;
 }
 
-int get_avoidance_heading(){
+double get_avoidance_heading(){
 	// cos and sin of 18, 54, 90, 126, 162. I know, there's a better way to do this 
-	std::array<float, 5> cos = {0.95105691, 0.58778832, 0.00000633, -0.58777809, -0.95105300};
+	std::array<float, 5> cos = {0.95105691, 0.58778832, 0, -0.58777809, -0.95105300};
 	std::array<float, 5> sin = {0.3090157909, 0.8090147631, 1, 0.8090222007, 0.3090278252};
+	//TODO finish this function, test and commit
+	//TODO make obstacle world
+	
+	double x_sum = 0;
+	double y_sum = 0;
+	
+	for(int i = 0; i < regions.size(); ++i){
+		x_sum = x_sum + regions[i] * cos[i];
+		y_sum = y_sum + regions[i] * sin[i];
+	}
+	
+	double desired_yaw = atan2(y_sum, x_sum);
 		
-	return 0;
+	return desired_yaw;
 }
 
-Robot_State avoid_obstacle(ros::Publisher &direction_pub, Robot_Pose Current_Pose){
-	Robot_State diff_drive_state = Robot_States::AVOID_OBSTACLE;
-	
-	return diff_drive_state;
-};/*
-	Robot_State diff_drive_state = Robot_States::AVOID_OBSTACLE;
-
+void avoid_obstacle(ros::Publisher &direction_pub, Robot_Pose Current_Pose){
 	double desired_yaw, err_yaw;
 	desired_yaw = get_avoidance_heading();
 	err_yaw = desired_yaw - Current_Pose.yaw;
@@ -69,27 +74,20 @@ Robot_State avoid_obstacle(ros::Publisher &direction_pub, Robot_Pose Current_Pos
 	geometry_msgs::Twist vel;		
 	
 	if (fabs(err_yaw) > g_yaw_precision){
-		ROS_INFO("Correcting yaw.");
+		ROS_INFO("Turning away from obstacle.");
 		vel.angular.z = -g_kp * err_yaw;
 		ROS_INFO("Current yaw: [%f]", Current_Pose.yaw);
 		ROS_INFO("Desired yaw: [%f]", desired_yaw);		
 		ROS_INFO("Current error: [%f]", err_yaw);				
 		
 	} else {
-		ROS_INFO("Yaw good homes.");	
+		ROS_INFO("Pointing away from the obstacle.");	
 		vel.angular.z = 0;		
 	}
-	
-	if (fabs(dist_to_obstacle) < g_min_safe_distance){
-		ROS_INFO("Driving away from obstacle.");
-		vel.linear.x = 0.1;				
 		
-	} else {
-		ROS_INFO("Position good homes.");			
-		diff_drive_state = Robot_State::GO_TO_GOAL;
-	}
+	ROS_INFO("Driving forward.");
+	vel.linear.x = 0.1;		
 		
 	direction_pub.publish(vel);
-	
-	return diff_drive_state;
-}*/
+
+}

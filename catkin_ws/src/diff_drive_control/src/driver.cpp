@@ -13,12 +13,13 @@
 
 
 // initialize robot goal pose (x, y, yaw)
-Robot_Pose Robot_Goal = {0, -1.0, 0};
+Robot_Pose Robot_Goal = {3.0, 0.0, 0};
 
 // diff_driver pose
 Robot_Pose Current_Pose;
 
-const double g_goal_dist = 0.2;
+const double g_goal_distance = 0.2;
+const double g_min_safe_distance = 0.5;
 
 
 void odom_callback(const nav_msgs::Odometry::ConstPtr &msg){
@@ -70,18 +71,32 @@ int main(int argc, char **argv)
   	
   	switch (diff_drive_state){
   		case Robot_States::GO_TO_GOAL:
-	  		if(dist_to_goal(Robot_Goal, Current_Pose) < g_goal_dist){
+	  		if(dist_to_goal(Robot_Goal, Current_Pose) < g_goal_distance){
+	  			ROS_INFO("Go to goal has reached the goal!");
 	  			diff_drive_state = Robot_States::STOP;
 	  		}
-	  		//else if (dist_to_obst < min_safe_dist){
-	  		//	diff_drive_state = Robot_States::AVOID_OBSTACLE;
-	  		//}
+	  		else if (min_obstacle_distance() < g_min_safe_distance){
+	  			ROS_INFO("Go to goal is avoiding an obstacle!");
+	  			diff_drive_state = Robot_States::AVOID_OBSTACLE;
+	  		}
 	  		else {
 	  			ROS_INFO("Go to goal!");
   				go_to_goal(direction_pub, Robot_Goal, Current_Pose);
 	  		}  		
 	  		break;
   		case Robot_States::AVOID_OBSTACLE:
+  			if(dist_to_goal(Robot_Goal, Current_Pose) < g_goal_distance){
+	  			ROS_INFO("Avoid obstacle has reached the");
+	  			diff_drive_state = Robot_States::STOP;
+	  		}
+	  		else if (min_obstacle_distance() > g_min_safe_distance){
+	  			ROS_INFO("Safe distance away, go to goal~");
+	  			diff_drive_state = Robot_States::GO_TO_GOAL;
+	  		}
+	  		else {
+	  			ROS_INFO("Avoid obstacle!");
+  				avoid_obstacle(direction_pub, Current_Pose);
+	  		}  		
   			break;
   		case Robot_States::STOP:
   			ROS_INFO("Stop!");

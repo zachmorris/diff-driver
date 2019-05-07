@@ -64,14 +64,14 @@
 
 <link name="caster_wheel">
   <collision>
-    <origin xyz="${casterRadius-chassisLength/2} 0 ${casterRadius-chassisHeight+wheelRadius}" rpy="0 0 0"/>
+    <origin xyz="${chassisLength/2-casterRadius} 0 ${casterRadius-chassisHeight+wheelRadius}" rpy="0 0 0"/>
     <geometry>
       <sphere radius="${casterRadius}"/>
     </geometry>
   </collision>
   
   <visual>
-    <origin xyz="${casterRadius-chassisLength/2} 0 ${casterRadius-chassisHeight+wheelRadius}" rpy="0 0 0"/>
+    <origin xyz="${chassisLength/2-casterRadius} 0 ${casterRadius-chassisHeight+wheelRadius}" rpy="0 0 0"/>
     <geometry>
       <sphere radius="${casterRadius}"/>
     </geometry>
@@ -79,7 +79,7 @@
   </visual>
 
   <inertial>
-    <origin xyz="${casterRadius-chassisLength/2} 0 ${casterRadius-chassisHeight+wheelRadius}" rpy="0 0 0"/>
+    <origin xyz="${chassisLength/2-casterRadius} 0 ${casterRadius-chassisHeight+wheelRadius}" rpy="0 0 0"/>
     <mass value="${casterMass}"/>
     <sphere_inertia m="${casterMass}" r="${casterRadius}"/>
   </inertial>
@@ -114,7 +114,7 @@
 
 <joint name="hokuyo_joint" type="fixed">
 	<axis xyz="0 1 0"/>
-	<origin xyz="${casterRadius-chassisLength/2} 0 ${chassisHeight+wheelRadius}" rpy="0 0 ${PI}"/> 
+	<origin xyz="${chassisLength/2-casterRadius} 0 ${chassisHeight+wheelRadius}" rpy="0 0 0"/> 
 	<parent link="base_link"/>
 	<child link="hokuyo_link"/>
 </joint>
