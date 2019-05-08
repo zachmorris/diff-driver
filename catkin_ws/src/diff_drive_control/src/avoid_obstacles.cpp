@@ -4,6 +4,7 @@
 
 // c++
 #include <cmath>			// for fabs
+#include <array>
 
 // ros includes
 #include "ros/ros.h"
@@ -86,7 +87,7 @@ void avoid_obstacle(ros::Publisher &direction_pub, Robot_Pose Current_Pose){
 	}
 		
 	ROS_INFO("Driving forward.");
-	vel.linear.x = 0.1;		
+	vel.linear.x = 0.2;		
 		
 	direction_pub.publish(vel);
 

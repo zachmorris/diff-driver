@@ -40,7 +40,7 @@ void go_to_goal(ros::Publisher &direction_pub, Robot_Pose Robot_Goal, Robot_Pose
 	}
 	
 	ROS_INFO("Driving forward.");
-	vel.linear.x = 0.1;		
+	vel.linear.x = 0.2;		
 		
 	direction_pub.publish(vel);
 	

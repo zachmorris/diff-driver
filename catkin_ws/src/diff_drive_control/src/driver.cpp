@@ -1,5 +1,6 @@
 // user includes
 #include "driver.h"
+#include "follow_wall.h"
 #include "avoid_obstacles.h"
 #include "go_to_goal.h"
 #include "stop.h"

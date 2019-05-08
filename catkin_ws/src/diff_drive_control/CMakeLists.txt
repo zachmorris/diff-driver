@@ -199,6 +199,6 @@ ${catkin_INCLUDE_DIRS}
 ## Add folders to be run by python nosetests
 # catkin_add_nosetests(test)
 
-add_executable(driver src/driver.cpp src/avoid_obstacles src/go_to_goal.cpp src/stop.cpp)
+add_executable(driver src/driver.cpp src/follow_wall.cpp src/avoid_obstacles.cpp src/go_to_goal.cpp src/stop.cpp)
 target_link_libraries(driver ${catkin_LIBRARIES})
 add_dependencies(driver diff_drive_control_generate_messages_cpp)
