@@ -5,11 +5,13 @@
 #include "go_to_goal.h"
 #include "stop.h"
 
+// c++ includes
+#include <array>
+
 // ros includes
 #include "ros/ros.h"
 #include "nav_msgs/Odometry.h"
 #include "sensor_msgs/LaserScan.h"
-
 #include "tf/tf.h"
 
 
@@ -22,12 +24,19 @@ Robot_Pose Current_Pose;
 const double g_goal_distance = 0.2;
 const double g_min_safe_distance = 0.5;
 
+double g_closest_to_goal;
+
+
+// laser scan variables
+double min_dist;
+std::array<float, 5> regions;
+
 
 void odom_callback(const nav_msgs::Odometry::ConstPtr &msg){
 	// get position
 	Current_Pose.x = msg->pose.pose.position.x;
 	Current_Pose.y = msg->pose.pose.position.y;
-	ROS_INFO("Current position: [%f, %f]", Current_Pose.x, Current_Pose.y);	
+	//ROS_INFO("Current position: [%f, %f]", Current_Pose.x, Current_Pose.y);	
 	
 	
 	// convert quaternion to Euler angles, get yaw	
@@ -40,6 +49,41 @@ void odom_callback(const nav_msgs::Odometry::ConstPtr &msg){
 	double roll, pitch;
 	m.getRPY(roll, pitch, Current_Pose.yaw);
 	
+}
+
+
+void laser_callback(const sensor_msgs::LaserScan::ConstPtr &scan){
+	
+ regions = { 
+		*std::min_element((scan->ranges).begin()      , (scan->ranges).begin() + 143),
+		*std::min_element((scan->ranges).begin() + 144, (scan->ranges).begin() + 287),
+		*std::min_element((scan->ranges).begin() + 288, (scan->ranges).begin() + 431),
+		*std::min_element((scan->ranges).begin() + 432, (scan->ranges).begin() + 575),
+		*std::min_element((scan->ranges).begin() + 576, (scan->ranges).begin() + 719)
+	};
+
+  for(auto &element : regions){
+  	if(std::isinf(element))
+  		element = 10;			
+  }
+  
+  min_dist = *std::min_element(regions.begin(), regions.end());
+  //ROS_INFO("Closest element: [%f]", min_dist);
+}
+
+
+double min_obstacle_distance(){
+	return min_dist;
+}
+
+
+bool progress_made(double dist_to_goal){
+		return (dist_to_goal < (g_closest_to_goal - 0.1));
+}
+
+
+bool can_detach(){
+	return (get_goal_heading(Robot_Goal, Current_Pose) < get_wall_heading(regions));
 }
 
 
@@ -81,7 +125,6 @@ int main(int argc, char **argv)
 	  			diff_drive_state = Robot_States::AVOID_OBSTACLE;
 	  		}
 	  		else {
-	  			ROS_INFO("Go to goal!");
   				go_to_goal(direction_pub, Robot_Goal, Current_Pose);
 	  		}  		
 	  		break;
@@ -95,12 +138,10 @@ int main(int argc, char **argv)
 	  			diff_drive_state = Robot_States::GO_TO_GOAL;
 	  		}
 	  		else {
-	  			ROS_INFO("Avoid obstacle!");
-  				avoid_obstacle(direction_pub, Current_Pose);
+  				avoid_obstacle(direction_pub, Current_Pose, regions);
 	  		}  		
   			break;
   		case Robot_States::STOP:
-  			ROS_INFO("Stop!");
   			stop(direction_pub);
   			break;
   		default:
