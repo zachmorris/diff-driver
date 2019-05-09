@@ -77,12 +77,17 @@ double min_obstacle_distance(){
 }
 
 
-bool progress_made(double dist_to_goal){
-		return (dist_to_goal < (g_closest_to_goal - 0.1));
+bool progress_made(){
+	ROS_INFO("Distance to goal: (%f)", dist_to_goal(Robot_Goal, Current_Pose));
+	ROS_INFO("Closest so far: (%f)", g_closest_to_goal);
+	return (dist_to_goal(Robot_Goal, Current_Pose) < (g_closest_to_goal - 0.01));
 }
 
 
 bool can_detach(){
+	ROS_INFO("Goal heading: (%f)", get_goal_heading(Robot_Goal, Current_Pose));
+	ROS_INFO("Wall heading: (%f)", get_wall_heading(regions));
+	
 	return (get_goal_heading(Robot_Goal, Current_Pose) < get_wall_heading(regions));
 }
 
@@ -121,29 +126,48 @@ int main(int argc, char **argv)
 	  			diff_drive_state = Robot_States::STOP;
 	  		}
 	  		else if (min_obstacle_distance() < g_min_safe_distance){
-	  			ROS_INFO("Go to goal is avoiding an obstacle!");
-	  			diff_drive_state = Robot_States::AVOID_OBSTACLE;
+	  			ROS_INFO("Switching to wall following!");
+	  			g_closest_to_goal = dist_to_goal(Robot_Goal, Current_Pose);
+	  			diff_drive_state = Robot_States::FOLLOW_WALL;
+	  			//diff_drive_state = Robot_States::AVOID_OBSTACLE;
 	  		}
 	  		else {
   				go_to_goal(direction_pub, Robot_Goal, Current_Pose);
 	  		}  		
 	  		break;
+	  		
   		case Robot_States::AVOID_OBSTACLE:
   			if(dist_to_goal(Robot_Goal, Current_Pose) < g_goal_distance){
-	  			ROS_INFO("Avoid obstacle has reached the");
+	  			ROS_INFO("Avoid obstacle is at the goal");
 	  			diff_drive_state = Robot_States::STOP;
 	  		}
 	  		else if (min_obstacle_distance() > g_min_safe_distance){
-	  			ROS_INFO("Safe distance away, go to goal~");
+	  			ROS_INFO("Obstacle avoided, go to goal");
 	  			diff_drive_state = Robot_States::GO_TO_GOAL;
 	  		}
 	  		else {
   				avoid_obstacle(direction_pub, Current_Pose, regions);
 	  		}  		
   			break;
+  			
+  		case Robot_States::FOLLOW_WALL:
+  			if(dist_to_goal(Robot_Goal, Current_Pose) < g_goal_distance){
+	  			ROS_INFO("Follow wall has reached the goal");
+	  			diff_drive_state = Robot_States::STOP;
+	  		}
+	  		else if (progress_made() and can_detach()){
+	  			ROS_INFO("Can detach from wall and go to goal");
+	  			diff_drive_state = Robot_States::GO_TO_GOAL;
+	  		}
+	  		else {
+  				follow_wall(direction_pub, Current_Pose, regions);
+	  		}  		
+  			break;
+
   		case Robot_States::STOP:
   			stop(direction_pub);
   			break;
+  			
   		default:
   			ROS_INFO("Unknown state!");
   			break;

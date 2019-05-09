@@ -5,6 +5,7 @@ namespace Robot_States
   {
      GO_TO_GOAL,
      AVOID_OBSTACLE,
+     FOLLOW_WALL,
      STOP
   };
 }
