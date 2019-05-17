@@ -6,6 +6,6 @@
 
 //double min_obstacle_distance();
 
-double get_avoidance_heading(const std::array<float, 5> &regions);
+double get_avoidance_heading(const std::array<float, 5> &laser_dist, double robot_yaw);
 
 void avoid_obstacle(ros::Publisher &direction_pub, Robot_Pose Current_Pose, const std::array<float, 5> &regions);

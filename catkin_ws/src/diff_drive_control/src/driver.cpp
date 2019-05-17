@@ -128,8 +128,8 @@ int main(int argc, char **argv)
 	  		else if (min_obstacle_distance() < g_min_safe_distance){
 	  			ROS_INFO("Switching to wall following!");
 	  			g_closest_to_goal = dist_to_goal(Robot_Goal, Current_Pose);
-	  			diff_drive_state = Robot_States::FOLLOW_WALL;
-	  			//diff_drive_state = Robot_States::AVOID_OBSTACLE;
+	  			//diff_drive_state = Robot_States::FOLLOW_WALL;
+	  			diff_drive_state = Robot_States::AVOID_OBSTACLE;
 	  		}
 	  		else {
   				go_to_goal(direction_pub, Robot_Goal, Current_Pose);
