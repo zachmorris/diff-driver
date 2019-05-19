@@ -34,9 +34,9 @@ void go_to_goal(ros::Publisher &direction_pub, Robot_Pose Robot_Goal, Robot_Pose
 	if (fabs(err_yaw) > g_yaw_precision){
 		//ROS_INFO("Correcting yaw.");
 		vel.angular.z = -g_kp * err_yaw;
-		//ROS_INFO("Current yaw: [%f]", Current_Pose.yaw);
-		//ROS_INFO("Desired yaw: [%f]", desired_yaw);		
-		//ROS_INFO("Current error: [%f]", err_yaw);				
+		ROS_INFO("Current yaw: [%f]", Current_Pose.yaw);
+		ROS_INFO("Desired yaw: [%f]", desired_yaw);		
+		ROS_INFO("Current error: [%f]", err_yaw);				
 		
 	} else {
 		//ROS_INFO("Yaw good homes.");	

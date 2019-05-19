@@ -67,15 +67,15 @@ void avoid_obstacle(ros::Publisher &direction_pub, Robot_Pose Current_Pose, cons
 	if (fabs(err_yaw) > g_yaw_precision){
 		//ROS_INFO("Turning away from obstacle.");
 		vel.angular.z = -g_kp * err_yaw;
-		//ROS_INFO("Current yaw: [%f]", Current_Pose.yaw);
-		//ROS_INFO("Desired yaw: [%f]", desired_yaw);		
-		//ROS_INFO("Current error: [%f]", err_yaw);				
+		ROS_INFO("Current yaw: [%f]", Current_Pose.yaw);
+		ROS_INFO("Desired yaw: [%f]", desired_yaw);		
+		ROS_INFO("Current error: [%f]", err_yaw);				
 		
 	} else {
 		//ROS_INFO("Pointing away from the obstacle.");	
 		vel.angular.z = 0;		
 	}
-	vel.linear.x = 0.2;		
+	vel.linear.x = 0.1;		
 		
 	direction_pub.publish(vel);
 

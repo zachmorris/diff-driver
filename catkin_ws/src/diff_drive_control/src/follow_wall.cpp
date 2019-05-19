@@ -14,7 +14,7 @@
 
 // precision
 const double g_yaw_precision 	= 3.14159/90;
-const double g_follow_wall_distance = 0.4;
+const double g_follow_wall_distance = 0.5;
 
 // PID variables
 const double g_kp 	= 1;

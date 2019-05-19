@@ -16,13 +16,14 @@
 
 
 // initialize robot goal pose (x, y, yaw)
-Robot_Pose Robot_Goal = {3.0, 0.0, 0};
+Robot_Pose Robot_Goal = {3.0, 2.0, 0};
 
 // diff_driver pose
 Robot_Pose Current_Pose;
 
 const double g_goal_distance = 0.2;
-const double g_min_safe_distance = 0.5;
+const double g_min_safe_distance = 0.4;
+const double g_min_fw_distance = 0.6;
 
 double g_closest_to_goal;
 
@@ -126,9 +127,8 @@ int main(int argc, char **argv)
 	  			diff_drive_state = Robot_States::STOP;
 	  		}
 	  		else if (min_obstacle_distance() < g_min_safe_distance){
-	  			ROS_INFO("Switching to wall following!");
+	  			ROS_INFO("GTG --> AO");
 	  			g_closest_to_goal = dist_to_goal(Robot_Goal, Current_Pose);
-	  			//diff_drive_state = Robot_States::FOLLOW_WALL;
 	  			diff_drive_state = Robot_States::AVOID_OBSTACLE;
 	  		}
 	  		else {
@@ -138,11 +138,11 @@ int main(int argc, char **argv)
 	  		
   		case Robot_States::AVOID_OBSTACLE:
   			if(dist_to_goal(Robot_Goal, Current_Pose) < g_goal_distance){
-	  			ROS_INFO("Avoid obstacle is at the goal");
+	  			ROS_INFO("Avoid obstacle is at the goal!");
 	  			diff_drive_state = Robot_States::STOP;
 	  		}
-	  		else if (min_obstacle_distance() > g_min_safe_distance){
-	  			ROS_INFO("Obstacle avoided, go to goal");
+	  		else if (min_obstacle_distance() > g_min_fw_distance){
+	  			ROS_INFO("Avoid obstacle going to goal");
 	  			diff_drive_state = Robot_States::GO_TO_GOAL;
 	  		}
 	  		else {
@@ -158,6 +158,10 @@ int main(int argc, char **argv)
 	  		else if (progress_made() and can_detach()){
 	  			ROS_INFO("Can detach from wall and go to goal");
 	  			diff_drive_state = Robot_States::GO_TO_GOAL;
+	  		}
+	  		else if (min_obstacle_distance() < g_min_safe_distance){
+	  			ROS_INFO("FW --> AO");
+	  			diff_drive_state = Robot_States::AVOID_OBSTACLE;
 	  		}
 	  		else {
   				follow_wall(direction_pub, Current_Pose, regions);
