@@ -77,11 +77,11 @@ double get_wall_heading(const std::array<float, 5> &dist_readings, Robot_Pose Cu
 	
 	double wall_front_x = dist_readings_wf_x[i];
 	double wall_front_y = dist_readings_wf_y[i];
-	ROS_INFO("FW: Wall front coordinates: [%f, %f]", wall_front_x, wall_front_y);
+	//ROS_INFO("FW: Wall front coordinates: [%f, %f]", wall_front_x, wall_front_y);
 
 	double wall_back_x = dist_readings_wf_x[j];
 	double wall_back_y = dist_readings_wf_y[j];
-	ROS_INFO("FW: Wall back coordinates: [%f, %f]", wall_back_x, wall_back_y);
+	//ROS_INFO("FW: Wall back coordinates: [%f, %f]", wall_back_x, wall_back_y);
 	
 	// wall vector = FB (points from back to front, along direction of motion)
 	double along_wall_x = wall_front_x - wall_back_x;
@@ -103,12 +103,12 @@ double get_wall_heading(const std::array<float, 5> &dist_readings, Robot_Pose Cu
   double to_wall_x = (wall_back_y - wall_front_y)*ms/ds;
   double to_wall_y = (wall_front_x - wall_back_x)*ms/ds;
   double norm_to_wall = sqrt(pow(to_wall_x, 2.0) + pow(to_wall_y, 2.0));
-  ROS_INFO("FW: to wall coordinates: [%f, %f]", to_wall_x, to_wall_y);
-  ROS_INFO("FW: Distance to wall: [%f]", norm_to_wall);
+  //ROS_INFO("FW: to wall coordinates: [%f, %f]", to_wall_x, to_wall_y);
+  //ROS_INFO("FW: Distance to wall: [%f]", norm_to_wall);
      
   // heading vector
 	double offset = fabs(ms/sqrt(ds)) - g_follow_wall_distance;
-	ROS_INFO("FW: offset [%f]", offset);
+	//ROS_INFO("FW: offset [%f]", offset);
 	
 	heading_x = g_follow_wall_distance * along_wall_x/norm_along_wall + offset * to_wall_x/norm_to_wall;
 	heading_y = g_follow_wall_distance * along_wall_y/norm_along_wall + offset * to_wall_y/norm_to_wall;		
@@ -129,14 +129,14 @@ void follow_wall(ros::Publisher &direction_pub, Robot_Pose Current_Pose, const s
 	geometry_msgs::Twist vel;		
 	
 	if (fabs(err_yaw) > g_yaw_precision){
-		ROS_INFO("FW: Turning parallel to wall.");
+		//ROS_INFO("FW: Turning parallel to wall.");
 		vel.angular.z = -g_kp * err_yaw;
-		ROS_INFO("FW: Current yaw: [%f]", Current_Pose.yaw);
-		ROS_INFO("FW: Desired yaw: [%f]", desired_yaw);		
+		//ROS_INFO("FW: Current yaw: [%f]", Current_Pose.yaw);
+		//ROS_INFO("FW: Desired yaw: [%f]", desired_yaw);		
 		//ROS_INFO("Current error: [%f]", err_yaw);				
 		
 	} else {
-		ROS_INFO("FW: Parallel to wall.");	
+		//ROS_INFO("FW: Parallel to wall.");	
 		vel.angular.z = 0;		
 	}
 		

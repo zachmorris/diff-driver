@@ -32,14 +32,14 @@ void go_to_goal(ros::Publisher &direction_pub, Robot_Pose Robot_Goal, Robot_Pose
 	geometry_msgs::Twist vel;		
 	
 	if (fabs(err_yaw) > g_yaw_precision){
-		ROS_INFO("GTG: Correcting yaw.");
+		//ROS_INFO("GTG: Correcting yaw.");
 		vel.angular.z = -g_kp * err_yaw;
-		ROS_INFO("GTG: Current yaw: [%f]", Current_Pose.yaw);
-		ROS_INFO("GTG: Desired yaw: [%f]", desired_yaw);		
+		//ROS_INFO("GTG: Current yaw: [%f]", Current_Pose.yaw);
+		//ROS_INFO("GTG: Desired yaw: [%f]", desired_yaw);		
 		//ROS_INFO("Current error: [%f]", err_yaw);				
 		
 	} else {
-		ROS_INFO("GTG: Yaw good homes.");	
+		//ROS_INFO("GTG: Yaw good homes.");	
 		vel.angular.z = 0;		
 	}
 	vel.linear.x = 0.2;		
