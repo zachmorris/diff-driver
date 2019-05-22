@@ -16,14 +16,14 @@
 
 
 // initialize robot goal pose (x, y, yaw)
-Robot_Pose Robot_Goal = {3.0, 2.0, 0};
+Robot_Pose Robot_Goal = {3.0, 1.5, 0};
 
 // diff_driver pose
 Robot_Pose Current_Pose;
 
 const double g_goal_distance = 0.2;
-const double g_min_safe_distance = 0.4;
-const double g_min_fw_distance = 0.6;
+const double g_min_safe_distance = 0.3;
+const double g_min_fw_distance = 0.5;
 
 double g_closest_to_goal;
 
@@ -37,7 +37,7 @@ void odom_callback(const nav_msgs::Odometry::ConstPtr &msg){
 	// get position
 	Current_Pose.x = msg->pose.pose.position.x;
 	Current_Pose.y = msg->pose.pose.position.y;
-	//ROS_INFO("Current position: [%f, %f]", Current_Pose.x, Current_Pose.y);	
+	ROS_INFO("DR: Current position: [%f, %f, %f]", Current_Pose.x, Current_Pose.y, Current_Pose.yaw);	
 	
 	
 	// convert quaternion to Euler angles, get yaw	
@@ -67,9 +67,10 @@ void laser_callback(const sensor_msgs::LaserScan::ConstPtr &scan){
   	if(std::isinf(element))
   		element = 10;			
   }
-  
+  ROS_INFO("DR: [%f, %f, %f, %f, %f]", regions[0], regions[1], regions[2], regions[3], regions[4]);
+    
   min_dist = *std::min_element(regions.begin(), regions.end());
-  //ROS_INFO("Closest element: [%f]", min_dist);
+  //ROS_INFO("Closest obstacle: [%f]", min_dist);
 }
 
 
@@ -79,17 +80,17 @@ double min_obstacle_distance(){
 
 
 bool progress_made(){
-	ROS_INFO("Distance to goal: (%f)", dist_to_goal(Robot_Goal, Current_Pose));
-	ROS_INFO("Closest so far: (%f)", g_closest_to_goal);
+	//ROS_INFO("Distance to goal: (%f)", dist_to_goal(Robot_Goal, Current_Pose));
+	//ROS_INFO("Closest so far: (%f)", g_closest_to_goal);
 	return (dist_to_goal(Robot_Goal, Current_Pose) < (g_closest_to_goal - 0.01));
 }
 
 
 bool can_detach(){
-	ROS_INFO("Goal heading: (%f)", get_goal_heading(Robot_Goal, Current_Pose));
-	ROS_INFO("Wall heading: (%f)", get_wall_heading(regions));
+	//ROS_INFO("Goal heading: (%f)", get_goal_heading(Robot_Goal, Current_Pose));
+	//ROS_INFO("Wall heading: (%f)", get_wall_heading(regions));
 	
-	return (get_goal_heading(Robot_Goal, Current_Pose) < get_wall_heading(regions));
+	return (get_goal_heading(Robot_Goal, Current_Pose) < get_wall_heading(regions, Current_Pose));
 }
 
 
@@ -126,10 +127,10 @@ int main(int argc, char **argv)
 	  			ROS_INFO("Go to goal has reached the goal!");
 	  			diff_drive_state = Robot_States::STOP;
 	  		}
-	  		else if (min_obstacle_distance() < g_min_safe_distance){
-	  			ROS_INFO("GTG --> AO");
+	  		else if (min_obstacle_distance() < g_min_fw_distance){
+	  			ROS_INFO("GTG --> FW");
 	  			g_closest_to_goal = dist_to_goal(Robot_Goal, Current_Pose);
-	  			diff_drive_state = Robot_States::AVOID_OBSTACLE;
+	  			diff_drive_state = Robot_States::FOLLOW_WALL;
 	  		}
 	  		else {
   				go_to_goal(direction_pub, Robot_Goal, Current_Pose);
@@ -142,8 +143,10 @@ int main(int argc, char **argv)
 	  			diff_drive_state = Robot_States::STOP;
 	  		}
 	  		else if (min_obstacle_distance() > g_min_fw_distance){
-	  			ROS_INFO("Avoid obstacle going to goal");
-	  			diff_drive_state = Robot_States::GO_TO_GOAL;
+	  			ROS_INFO("Avoid obstacle --> FW");
+	  			g_closest_to_goal = dist_to_goal(Robot_Goal, Current_Pose);
+	  			ROS_INFO("AO closest to goal: %f", g_closest_to_goal);
+	  			diff_drive_state = Robot_States::FOLLOW_WALL;
 	  		}
 	  		else {
   				avoid_obstacle(direction_pub, Current_Pose, regions);

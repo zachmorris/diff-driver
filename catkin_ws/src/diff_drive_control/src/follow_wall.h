@@ -3,6 +3,6 @@
 // ros
 #include "ros/ros.h"
 
-double get_wall_heading(const std::array<float, 5> &dist_readings);
+double get_wall_heading(const std::array<float, 5> &dist_readings, Robot_Pose Current_Pose);
 
 void follow_wall(ros::Publisher &direction_pub, Robot_Pose Current_Pose, const std::array<float, 5> &dist_readings);
